@@ -20,8 +20,8 @@ public class BoardController {
     BoardService boardService;
 
     @PostMapping("/write")
-    public void insertBoard(@RequestBody Map<String,Object> boardObj, MultipartFile file) throws Exception {
-        boardService.write(boardObj, file); //하단 insertBoard2랑 비교 확인
+    public void insertBoard(@RequestBody Map<String,Object> boardObj) throws Exception {
+        boardService.write(boardObj); //하단 insertBoard2랑 비교 확인
     }
 
 //    @PostMapping("/write") //return 값이 String
