@@ -11,17 +11,15 @@
 CREATE TABLE `Board` (
   `boardId` int(11) NOT NULL AUTO_INCREMENT,
   `userId` varchar(100) NOT NULL,
-  `tagId` int(11) DEFAULT NULL,
   `title` varchar(100) NOT NULL,
   `content` text NOT NULL,
   `partyId` int(11) NOT NULL,
+  `views` int(11) NOT NULL DEFAULT 0,
   `writeDate` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`boardId`),
   KEY `Board_FK` (`userId`),
-  KEY `Board_FK_1` (`tagId`),
   KEY `Board_FK_2` (`partyId`),
   CONSTRAINT `Board_FK` FOREIGN KEY (`userId`) REFERENCES `User` (`userId`) ON DELETE CASCADE,
-  CONSTRAINT `Board_FK_1` FOREIGN KEY (`tagId`) REFERENCES `Tag` (`tagId`) ON DELETE SET NULL,
   CONSTRAINT `Board_FK_2` FOREIGN KEY (`partyId`) REFERENCES `Party` (`partyId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -77,6 +75,18 @@ CREATE TABLE `Tag` (
   `tagName` varchar(100) NOT NULL,
   PRIMARY KEY (`tagId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 글 별 태그 목록 테이블
+CREATE TABLE `TagBoard` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT,
+  `tagId` int(11) NOT NULL,
+  `boardId` int(11) NOT NULL,
+  PRIMARY KEY (`idx`),
+  KEY `NewTable_FK` (`boardId`),
+  KEY `NewTable_FK_1` (`tagId`),
+  CONSTRAINT `NewTable_FK` FOREIGN KEY (`boardId`) REFERENCES `Board` (`boardId`),
+  CONSTRAINT `NewTable_FK_1` FOREIGN KEY (`tagId`) REFERENCES `Tag` (`tagId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
 
 ## api요청시 주의사항
@@ -109,10 +119,9 @@ CREATE TABLE `Tag` (
 <td>회원가입 후 세션<br>생성하여 자동로그인</td>
 <td><code>
 {
-    "userId" : "",    <br> &emsp;
-    "userName" : "",  <br> &emsp;
-    "password" : "",  <br> &emsp;
-    "regDate" : null  <br>
+    userId : String,    <br> &emsp;
+    userName : String,  <br> &emsp;
+    password : String,  <br>
 }
 </code></td>
 <td>userId</td>
@@ -123,8 +132,8 @@ CREATE TABLE `Tag` (
 <td>세션 생성하여 로그인</td>
 <td><code>
 {
-    "userId" : "",    <br> &emsp;
-    "password" : "",  <br>
+    userId : String,    <br> &emsp;
+    password : String,  <br>
 }
 </code></td>
 <td>
@@ -153,10 +162,9 @@ id가 존재하지만 pw가 틀렸을 때 : "1"<br>
 <td>회원정보 수정(세션에 저장된 userId와<br>넘긴 데이터의 userId가 같은지 확인하기<br>때문에 로그인이 돼있어야 함)</td>
 <td><code>
 {
-    "userId" : "",    <br> &emsp;
-    "userName" : "",  <br> &emsp;
-    "password" : "",  <br> &emsp;
-    "regDate" : null  <br>
+    userId : String,    <br> &emsp;
+    userName : String,  <br> &emsp;
+    password : String,  <br>
 }
 </code></td>
 <td>-</td>
@@ -167,8 +175,8 @@ id가 존재하지만 pw가 틀렸을 때 : "1"<br>
 <td>회원정보 삭제</td>
 <td><code>
 {
-    "userId" : "",    <br> &emsp;
-    "password" : "",  <br>
+    userId : String,    <br> &emsp;
+    password : String,  <br>
 }
 </code></td>
 <td>
@@ -194,17 +202,16 @@ id가 맞고 pw가 틀릴때 : "1"<br>
 <td>게시물 작성</td>
 <td><code>
 {
-    "idx" : null, <br>
-    "userId" : "", <br>
-    "title" : "", <br>
-    "content" : "", <br>
-    "writeDate" : null, <br>
-    "imageLoc" : null <br>
+    userId : String, <br>
+    title : String, <br>
+    content : String, <br>
+    total : Integer, <br>
+    current : Integer, <br>
+    tagId : X or [Integer, Integer ...], <br>
+    tagName : X or [String, String, ...], <br>
 }
 </code></td>
-<td>title 미작성 시 : "0" <br>
-content 미작성 시 : "1" <br>
-게시물 작성 성공 : idx</td>
+<td>게시물 작성 성공 : boardId</td>
 </tr>
 <tr>
 <td>/list(/ASC)</td>
@@ -218,14 +225,13 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 <td><code>
 [<br>
     {<br>
-        "userId" : "", <br>
-	    "title" : "", <br>
-    	"writeDate" : null <br>
+        userId : String, <br>
+	    title : string, <br>
     }, <br>
     {<br>
-        "userId" : "", <br>
-	    "title" : "", <br>
-    	"writeDate" : null <br>
+        userId : String, <br>
+	    title : String, <br>
+    	writeDate : Timestamp <br>
     }, .....<br>
 ]
 </code></td>
@@ -239,12 +245,32 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 </code></td>
 <td><code>
 {
-    "idx" : idx, <br>
-    "userId" : "", <br>
-    "title" : "", <br>
-    "content" : "", <br>
-    "writeDate" : "", <br>
-    "imageLoc" : "" <br>
+    Board : { <br>
+        baordId : Integer, <br>
+        userId : String, <br>
+        title : String, <br>
+        content : String, <br>
+        partyId : Integer, <br>
+        view : Integer, <br>
+        writeDate : Timestamp <br>
+    }, <br>
+    Party : { <br>
+        partyId : Integer, <br>
+        total : Integer, <br>
+        current : Integer, <br>
+        isActive : boolean, <br>
+    }, <br>
+    Tags : [ <br>
+        { <br>
+            tagId : Integer <br>
+            tagName : String <br>
+        }, <br>
+        { <br>
+            tagId : Integer <br>
+            tagName : String <br>
+        }, <br>
+        ... <br>
+    ] <br>
 }
 </code></td>
 </tr>
@@ -254,12 +280,10 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 <td>게시물 수정 (users의 회원 정보 수정과 동일하게 세션에 저장된 userId와 넘긴 데이터의 userId가 같은지 확인)</td>
 <td><code>
 {
-    "idx" : 글의 인덱스,
-    "userId" : "글의 유저 아이디",
-    "title" : "",
-    "content" : "",
-    "writeDate" : null,
-    "imageLoc" : null
+    boardId : Integer,
+    userId : String,
+    title : String,
+    content : String,
 }
 </code></td>
 <td>-</td>
@@ -270,8 +294,8 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 <td>게시물 삭제 (세션에 저장된 userId와 넘긴 데이터의 userId가 같은지 확인)</td>
 <td><code>
 {
-    "idx" : 글의 인덱스, <br>
-    "userId" : "글의 유저 아이디"<br>
+    boardId : Integer, <br>
+    userId : String<br>
 }
 </code></td>
 <td>userId 상이할 시 : "1"
