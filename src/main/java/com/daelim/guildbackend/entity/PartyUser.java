@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.*;
+import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -13,16 +13,11 @@ import java.sql.Timestamp;
 @Data
 @DynamicInsert
 @DynamicUpdate
-//@ToString
 @Entity
-public class Board {
+public class PartyUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer boardId;
-    private String userId;
-    private Integer tagId;
-    private String title;
-    private String content;
+    private Integer idx;
     private Integer partyId;
-    private Timestamp writeDate;
+    private String userId;
 }

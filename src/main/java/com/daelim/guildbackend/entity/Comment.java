@@ -1,10 +1,7 @@
 package com.daelim.guildbackend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.*;
+import jakarta.persistence.*;
+import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -13,16 +10,16 @@ import java.sql.Timestamp;
 @Data
 @DynamicInsert
 @DynamicUpdate
-//@ToString
 @Entity
-public class Board {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer cmtId;
     private Integer boardId;
     private String userId;
-    private Integer tagId;
-    private String title;
-    private String content;
-    private Integer partyId;
+    private Integer target;
+    private String comment;
+    @Column(columnDefinition = "TINYINT(1)")
+    private boolean isPublic;
     private Timestamp writeDate;
 }
