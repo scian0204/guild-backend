@@ -225,15 +225,51 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 <td><code>
 [<br>
     {<br>
-        userId : String, <br>
-	    title : string, <br>
-    }, <br>
+        board : {<br>
+            boardId : integeer,<br>
+            userId : String,<br>
+            title : String,<br>
+            content : String,<br>
+            partyId : Integer,<br>
+            views : Integer,<br>
+            writeDate : TimeStamp<br>
+        },<br>
+        tags : [<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            ...<br>
+        ]<br>
+    },<br>
     {<br>
-        userId : String, <br>
-	    title : String, <br>
-    	writeDate : Timestamp <br>
-    }, .....<br>
-]
+        board : {<br>
+            boardId : integeer,<br>
+            userId : String,<br>
+            title : String,<br>
+            content : String,<br>
+            partyId : Integer,<br>
+            views : Integer,<br>
+            writeDate : TimeStamp<br>
+        },<br>
+        tags : [<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            ...<br>
+        ]<br>
+    },<br>
+    ...<br>
+]<br>
 </code></td>
 </tr>
 <tr>
@@ -241,7 +277,7 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 <td>GET</td>
 <td>게시물 상세 페이지 조회</td>
 <td><code>
-    {idx}
+    {boardId}
 </code></td>
 <td><code>
 {
@@ -305,5 +341,115 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 </code></td>
 <td>userId 상이할 시 : "1"
 삭제 시 : "0"</td>
+</tr>
+<tr>
+<td>/search/{text}</td>
+<td>GET</td>
+<td>제목이나 내용에 text가 포함된 게시글과 태그들을 리스트로 반환</td>
+<td><code>-</code></td>
+<td><code>
+[<br>
+    {<br>
+        board : {<br>
+            boardId : integeer,<br>
+            userId : String,<br>
+            title : String,<br>
+            content : String,<br>
+            partyId : Integer,<br>
+            views : Integer,<br>
+            writeDate : TimeStamp<br>
+        },<br>
+        tags : [<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            ...<br>
+        ]<br>
+    },<br>
+    {<br>
+        board : {<br>
+            boardId : integeer,<br>
+            userId : String,<br>
+            title : String,<br>
+            content : String,<br>
+            partyId : Integer,<br>
+            views : Integer,<br>
+            writeDate : TimeStamp<br>
+        },<br>
+        tags : [<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            ...<br>
+        ]<br>
+    },<br>
+    ...<br>
+]<br>
+</code></td>
+</tr>
+<tr>
+<td>/searchByTagid/{tagId}</td>
+<td>GET</td>
+<td>태그id의 태그가 달린 게시글과 태그 목록 반환</td>
+<td><code>-</code></td>
+<td><code>
+[<br>
+    {<br>
+        board : {<br>
+            boardId : integeer,<br>
+            userId : String,<br>
+            title : String,<br>
+            content : String,<br>
+            partyId : Integer,<br>
+            views : Integer,<br>
+            writeDate : TimeStamp<br>
+        },<br>
+        tags : [<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            ...<br>
+        ]<br>
+    },<br>
+    {<br>
+        board : {<br>
+            boardId : integeer,<br>
+            userId : String,<br>
+            title : String,<br>
+            content : String,<br>
+            partyId : Integer,<br>
+            views : Integer,<br>
+            writeDate : TimeStamp<br>
+        },<br>
+        tags : [<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            ...<br>
+        ]<br>
+    },<br>
+    ...<br>
+]<br>
+</code></td>
 </tr>
 </table>
