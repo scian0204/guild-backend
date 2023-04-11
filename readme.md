@@ -279,11 +279,16 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 <td>PUT</td>
 <td>게시물 수정 (users의 회원 정보 수정과 동일하게 세션에 저장된 userId와 넘긴 데이터의 userId가 같은지 확인)</td>
 <td><code>
-{
-    boardId : Integer,
-    userId : String,
-    title : String,
-    content : String,
+{<br>
+    boardId : Integer, <br>
+    userId : String, <br>
+    title : String, <br>
+    content : String, <br>
+    partyId : Integer, <br>
+    tagId : X or [Integer, Integer, ...], <br>
+    tagName : X or [String, String, ...], <br>
+    total : X or Integer, <br>
+    current : X or Integer, <br>
 }
 </code></td>
 <td>-</td>
