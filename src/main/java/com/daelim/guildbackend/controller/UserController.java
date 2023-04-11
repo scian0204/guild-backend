@@ -44,4 +44,9 @@ public class UserController {
     public String deleteUser(@RequestBody Map<String, Object> userObj, HttpSession session) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         return userService.deleteUser(userObj, session);
     }
+
+    @GetMapping("/isIdDup/{userId}")
+    public boolean isIdDup(@PathVariable String userId) {
+        return userService.isIdDup(userId);
+    }
 }

@@ -94,4 +94,13 @@ public class UserService{
         }
         return sb.toString();
     }
+    
+    public boolean isIdDup(String userId) {
+        boolean result = false;
+        Optional<User> userS = userRepository.findByUserId(userId);
+        if (userS.isPresent()) {
+            result = true;
+        }
+        return result;
+    }
 }
