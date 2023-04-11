@@ -19,18 +19,6 @@ public class BoardController {
     @Autowired
     BoardService boardService;
 
-    // 글 작성
-    /* 받을 데이터
-     * {
-     *   userId: String,
-     *   title: String,
-     *   content: String,
-     *   total: int,
-     *   current: int,
-     *   tagName: X or String[],
-     *   tagId: X or int[]
-     * }
-     * */
     @PostMapping("/write")
     public Integer insertBoard(@RequestBody Map<String,Object> boardObj) {
         return boardService.write(boardObj);

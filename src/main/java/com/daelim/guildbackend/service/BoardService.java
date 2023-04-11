@@ -79,7 +79,6 @@ public class BoardService{
     }
 
     public Map<String, Object> viewBoard(Integer boardId) { //게시물 상세 페이지
-
         // Board - boardId로 검색 후 조회수 + 1
         Board board = boardRepository.findById(boardId).get();
         if (board.getBoardId() == null) {
@@ -98,7 +97,7 @@ public class BoardService{
         List<Tag> tags = new ArrayList<>();
         List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(boardId);
         tagBoards.forEach((tagBoard)->{
-            tags.add((Tag) tagRepository.findByTagId(tagBoard.getTagId()));
+            tags.add(tagRepository.findById(tagBoard.getTagId()).get());
         });
         resultMap.put("Tags", tags);
 
@@ -106,12 +105,57 @@ public class BoardService{
     }
 
     public void updateBoard(Map<String, Object> boardObj, HttpSession session) {
-        Board board = objMpr.convertValue(boardObj, Board.class);
-        if (session.getAttribute("userId") != null && session.getAttribute("userId").equals(board.getUserId())) {
+        if (session.getAttribute("userId") != null && session.getAttribute("userId").equals(boardObj.get("userId"))) {
+            Integer[] updateTagIds = null;
+            String[] tagNames = null;
+            Integer total = null;
+            Integer current = null;
+            Integer boardId = (Integer) boardObj.get("boardId");
+            TagBoard tb = new TagBoard();
+            tb.setBoardId(boardId);
 
-            Optional<Board> optBoard = boardRepository.findById(board.getBoardId());
-            Board board1 = optBoard.get();
+            if (boardObj.get("tagId") != null) {
+                updateTagIds = g.fromJson(boardObj.get("tagId")+"", Integer[].class);
+                tagBoardRepository.deleteAllByBoardId(boardId);
+                for (Integer tagId:
+                     updateTagIds) {
+                    tb.setTagId(tagId);
+                    tagBoardRepository.save(tb);
+                }
+                boardObj.remove("tagId");
+            }
+            if (boardObj.get("tagName") != null) {
+                tagNames = g.fromJson(boardObj.get("tagName")+"", String[].class);
+                Tag tag = new Tag();
+                Integer tagId = null;
+                for (String tagName :
+                        tagNames) {
+                    tag.setTagName(tagName);
+                    tagId = tagRepository.save(tag).getTagId();
+                    tb.setTagId(tagId);
+                    tagBoardRepository.save(tb);
+                }
+                boardObj.remove("tagName");
+            }
+            Party party = partyRepository.findById((Integer) boardObj.get("partyId")).get();
+            if (boardObj.get("total") != null) {
+                total = (Integer) boardObj.get("total");
+                party.setTotal(total);
+                partyRepository.save(party);
+                boardObj.remove("total");
+            }
+            if (boardObj.get("current") != null) {
+                current = (Integer) boardObj.get("current");
+                party.setCurrent(current);
+                partyRepository.save(party);
+                boardObj.remove("current");
+            }
+            Board board = objMpr.convertValue(boardObj, Board.class);
+
+            //board
+            Board board1 = boardRepository.findById(board.getBoardId()).get();
             board.setWriteDate(board1.getWriteDate());
+            board.setViews(board1.getViews());
 
             boardRepository.save(board);
         }

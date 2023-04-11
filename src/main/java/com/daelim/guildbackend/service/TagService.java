@@ -13,6 +13,6 @@ public class TagService {
     TagRepository tagRepository;
 
     public List<Tag> getListbyTagName(String tagName) {
-        return tagRepository.findByTagName(tagName);
+        return tagRepository.findByTagNameLikeIgnoreCase("%"+tagName+"%");
     }
 }
