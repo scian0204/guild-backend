@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface TagBoardRepository extends JpaRepository<TagBoard, Integer> {
     List<TagBoard> findByBoardId(Integer boardId);
+    List<TagBoard> findByTagId(Integer tagId);
     void deleteAllByBoardId(Integer boardId);
 }

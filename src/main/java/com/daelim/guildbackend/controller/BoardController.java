@@ -24,15 +24,15 @@ public class BoardController {
         return boardService.write(boardObj);
     }
 
-    // 글 목록 - 오름차순
+    // 글 목록 - 내림차순
     @GetMapping("/list")
-    public Page<Board> getAllBoardsDESC(@PageableDefault(page = 0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable) {
+    public List<Map<String, Object>> getAllBoardsDESC(@PageableDefault(page = 0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable) {
         return boardService.getAllBoards(pageable);
     }
 
-    // 글 목록 - 내림차순
+    // 글 목록 - 오름차순
     @GetMapping("/list/ASC")
-    public Page<Board> getAllBoardsASC(@PageableDefault(page = 0, size = 10, sort = "boardId", direction = Sort.Direction.ASC) Pageable pageable) {
+    public List<Map<String, Object>> getAllBoardsASC(@PageableDefault(page = 0, size = 10, sort = "boardId", direction = Sort.Direction.ASC) Pageable pageable) {
         return boardService.getAllBoards(pageable);
     }
 
@@ -49,13 +49,19 @@ public class BoardController {
     }
 
     // 글 삭제
-    @PostMapping("/delete") //POST 형식
+    @PostMapping("/delete")
     public String deleteBoardPost(@RequestBody Map<String,Object> boardObj, HttpSession session) {
         return boardService.deleteBoardPost(boardObj, session);
     }
 
-    @PostMapping("/test")
-    public Map<String, Object> test(@RequestBody Map<String, Object> obj) {
-        return boardService.test(obj);
+    // 글 검색
+    @GetMapping("/search/{text}")
+    public List<Map<String, Object>> searchBoard(@PathVariable String text) {
+        return boardService.searchBoard(text);
+    }
+
+    @GetMapping("/searchByTagId/{tagId}")
+    public List<Map<String, Object>> searchBoardByTagId(@PathVariable Integer tagId) {
+        return boardService.searchBoardByTagId(tagId);
     }
 }

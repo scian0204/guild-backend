@@ -1,9 +1,6 @@
 package com.daelim.guildbackend.service;
 
-import com.daelim.guildbackend.entity.Board;
-import com.daelim.guildbackend.entity.Party;
-import com.daelim.guildbackend.entity.Tag;
-import com.daelim.guildbackend.entity.TagBoard;
+import com.daelim.guildbackend.entity.*;
 import com.daelim.guildbackend.repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -12,10 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Service
+@Transactional
+@jakarta.transaction.Transactional
 public class BoardService{
     ObjectMapper objMpr = new ObjectMapper();
     Gson g = new Gson();
@@ -34,48 +34,72 @@ public class BoardService{
         // 파티 생성
         Party party = new Party();
         party.setTotal((Integer) boardObj.get("total"));
-        party.setCurrent((Integer) boardObj.get("current"));
         boardObj.remove("total");
-        boardObj.remove("current");
         int partyId = partyRepository.save(party).getPartyId();
+
+        PartyUser partyUser = new PartyUser();
+        partyUser.setPartyId(partyId);
+        partyUser.setUserId(boardObj.get("userId")+"");
+        partyUserRepository.save(partyUser);
+
+        Integer[] tagIds = g.fromJson(boardObj.get("tagId")+"", Integer[].class);
+        String[] tagNames = g.fromJson(boardObj.get("tagName")+"", String[].class);
+        boardObj.remove("tagId");
+        boardObj.remove("tagName");
+
+        // boardObj를 Board 객체로 변경 후 board 테이블에 저장
+        Board board = objMpr.convertValue(boardObj, Board.class);
+        board.setPartyId(partyId);
+        Integer boardId = boardRepository.save(board).getBoardId();
 
         // 태그 존재 확인
         // 기존에 있던 태그면 tagBoard에 저장
         // 기존에 없던 태그면 생성 후 tagBoard 저장
-        if (boardObj.get("tagId") != null) {
-            Integer[] i = g.fromJson(boardObj.get("tagId")+"", Integer[].class);
-            TagBoard tb = new TagBoard();
-            tb.setBoardId((Integer)boardObj.get("boardId"));
+        if (tagIds != null) {
+            System.out.println(tagIds);
             for (Integer tagId :
-                    i) {
+                    tagIds) {
+                TagBoard tb = new TagBoard();
+                tb.setBoardId(boardId);
                 tb.setTagId(tagId);
                 tagBoardRepository.save(tb);
             }
-            boardObj.remove("tagId");
-        } else if (boardObj.get("tagName") != null) {
-            String[] arr = g.fromJson(boardObj.get("tagName")+"", String[].class);
-            Tag tag = new Tag();
-            TagBoard tb = new TagBoard();
-            tb.setBoardId((Integer)boardObj.get("boardId"));
+        }
+        if (tagNames != null) {
+            System.out.println(tagNames);
             for (String tagName :
-                    arr) {
+                    tagNames) {
+                Tag tag = new Tag();
+                TagBoard tb = new TagBoard();
+                tb.setBoardId(boardId);
                 tag.setTagName(tagName);
-                tag.setTagId(tagRepository.save(tag).getTagId());
-                tb.setTagId(tag.getTagId());
+                Integer tagId = tagRepository.save(tag).getTagId();
+                tb.setTagId(tagId);
                 tagBoardRepository.save(tb);
             }
-            boardObj.remove("tagName");
         }
-        
-        // boardObj를 Board 객체로 변경 후 board 테이블에 저장
-        Board board = objMpr.convertValue(boardObj, Board.class);
-        board.setPartyId(partyId);
 
-        return boardRepository.save(board).getBoardId();
+
+        return boardId;
     }
 
-    public Page<Board> getAllBoards(Pageable pageable) {
-        return boardRepository.findAll(pageable);
+    public List<Map<String, Object>> getAllBoards(Pageable pageable) {
+        List<Map<String, Object>> results = new ArrayList<>();
+        Page<Board> boards = boardRepository.findAll(pageable);
+
+        boards.forEach(board -> {
+            Map<String, Object> result = new HashMap<>();
+            result.put("board", board);
+            List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(board.getBoardId());
+            List<Tag> tags = new ArrayList<>();
+            tagBoards.forEach(tagBoard -> {
+                tags.add(tagRepository.findById(tagBoard.getTagId()).get());
+            });
+            result.put("tags", tags);
+            results.add(result);
+        });
+
+        return results;
     }
 
     public Map<String, Object> viewBoard(Integer boardId) { //게시물 상세 페이지
@@ -106,34 +130,34 @@ public class BoardService{
 
     public void updateBoard(Map<String, Object> boardObj, HttpSession session) {
         if (session.getAttribute("userId") != null && session.getAttribute("userId").equals(boardObj.get("userId"))) {
-            Integer[] updateTagIds = null;
-            String[] tagNames = null;
+            Integer[] updateTagIds = g.fromJson(boardObj.get("tagId")+"", Integer[].class);
+            boardObj.remove("tagId");
+            String[] tagNames = g.fromJson(boardObj.get("tagName")+"", String[].class);
             Integer total = null;
-            Integer current = null;
             Integer boardId = (Integer) boardObj.get("boardId");
             TagBoard tb = new TagBoard();
             tb.setBoardId(boardId);
 
-            if (boardObj.get("tagId") != null) {
-                updateTagIds = g.fromJson(boardObj.get("tagId")+"", Integer[].class);
+            if (updateTagIds != null) {
                 tagBoardRepository.deleteAllByBoardId(boardId);
                 for (Integer tagId:
                      updateTagIds) {
                     tb.setTagId(tagId);
                     tagBoardRepository.save(tb);
+                    tb.setIdx(null);
                 }
-                boardObj.remove("tagId");
             }
-            if (boardObj.get("tagName") != null) {
-                tagNames = g.fromJson(boardObj.get("tagName")+"", String[].class);
+            if (tagNames != null) {
                 Tag tag = new Tag();
                 Integer tagId = null;
                 for (String tagName :
                         tagNames) {
                     tag.setTagName(tagName);
                     tagId = tagRepository.save(tag).getTagId();
+                    tag.setTagId(null);
                     tb.setTagId(tagId);
                     tagBoardRepository.save(tb);
+                    tb.setIdx(null);
                 }
                 boardObj.remove("tagName");
             }
@@ -143,12 +167,6 @@ public class BoardService{
                 party.setTotal(total);
                 partyRepository.save(party);
                 boardObj.remove("total");
-            }
-            if (boardObj.get("current") != null) {
-                current = (Integer) boardObj.get("current");
-                party.setCurrent(current);
-                partyRepository.save(party);
-                boardObj.remove("current");
             }
             Board board = objMpr.convertValue(boardObj, Board.class);
 
@@ -175,18 +193,42 @@ public class BoardService{
         }
     }
 
-    public Map<String, Object> test(Map<String, Object> obj) {
-        Map<String, Object> list = new HashMap<>();
-        List<Tag> tags = new ArrayList<>();
-        tags.add(new Tag());
-        tags.add(new Tag());
-        tags.add(new Tag());
-        tags.add(new Tag());
+    public List<Map<String, Object>> searchBoard(String text) {
+        List<Map<String, Object>> results = new ArrayList<>();
 
-        list.put("Board", new Board());
-        list.put("Tags", tags);
-        list.put("Party", new Party());
+        List<Board> boards = boardRepository.findByTitleLikeIgnoreCaseOrContentLikeIgnoreCase("%" + text + "%", "%" + text + "%");
+        boards.forEach(board -> {
+            Map<String, Object> result = new HashMap<>();
+            result.put("board", board);
+            List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(board.getBoardId());
+            List<Tag> tags = new ArrayList<>();
+            tagBoards.forEach(tagBoard -> {
+                tags.add(tagRepository.findById(tagBoard.getTagId()).get());
+            });
+            result.put("tags", tags);
 
-        return list;
+            results.add(result);
+        });
+
+        return results;
+    }
+
+    public List<Map<String, Object>> searchBoardByTagId(Integer tagId) {
+        List<Map<String, Object>> results = new ArrayList<>();
+        List<TagBoard> tagBoards = tagBoardRepository.findByTagId(tagId);
+        tagBoards.forEach(tagBoard -> {
+            Map<String, Object> result = new HashMap<>();
+            result.put("board", boardRepository.findById(tagBoard.getBoardId()).get());
+            List<TagBoard> tagBoards1 = tagBoardRepository.findByBoardId(tagBoard.getBoardId());
+            List<Tag> tags = new ArrayList<>();
+            tagBoards1.forEach(tagBoard1 -> {
+                tags.add(tagRepository.findById(tagBoard1.getTagId()).get());
+            });
+            result.put("tags", tags);
+
+            results.add(result);
+        });
+
+        return results;
     }
 }
