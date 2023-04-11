@@ -185,6 +185,16 @@ id가 맞고 pw가 틀릴때 : "1"<br>
 삭제됐을 때 : "2"
 </td>
 </tr>
+<tr>
+<td>/isIdDup/{userId}</td>
+<td>GET</td>
+<td>아이디 중복 체크</td>
+<td><code>-</code></td>
+<td>
+userId가 중복일 때 : true<br>
+UserId가 중복이 아닐때 : false<br>
+</td>
+</tr>
 </table>
 <hr>
 /api/boards
@@ -451,5 +461,71 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
     ...<br>
 ]<br>
 </code></td>
+</tr>
+</table>
+<hr/>
+/api/tag
+<table>
+<tr>
+<th>URL</th>
+<th>Method</th>
+<th>설명</th>
+<th>request</th>
+<th>response</th>
+</tr>
+<tr>
+<td>/{tagName}</td>
+<td>GET</td>
+<td>해당 이름이 포함된 Tag 검색</td>
+<td><code>-</code></td>
+<td><code>
+[<br>
+    {<br>
+        tagId : Integer,<br>
+        tagName : String<br>
+    },<br>
+    {<br>
+        tagId : Integer,<br>
+        tagName : String<br>
+    },<br>
+    ...<br>
+]<br>
+</code></td>
+</tr>
+</table>
+
+<hr/>
+/api/party
+<table>
+<tr>
+<th>URL</th>
+<th>Method</th>
+<th>설명</th>
+<th>request</th>
+<th>response</th>
+</tr>
+<tr>
+<td>/join</td>
+<td>POST</td>
+<td>파티 참가</td>
+<td><code>
+{ <br>
+    partyId : Integer, <br>
+    userId : String <br>
+} <br>
+</code></td>
+<td><code>partyId</code></td>
+</tr>
+<tr>
+<td>/leave</td>
+<td>POST</td>
+<td>파티 탈퇴</td>
+<td><code>
+{ <br>
+    partyId : Integer, <br>
+    userId : String <br>
+} <br>
+</code></td>
+<td><code>-</code></td>
 </tr>
 </table>
