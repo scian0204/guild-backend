@@ -69,10 +69,16 @@ public class BoardService{
             System.out.println(tagNames);
             for (String tagName :
                     tagNames) {
-                Tag tag = new Tag();
                 TagBoard tb = new TagBoard();
                 tb.setBoardId(boardId);
-                tag.setTagName(tagName);
+                Optional<Tag> tagOp = tagRepository.findByTagName(tagName);
+                Tag tag = null;
+                if (tagOp.isPresent()){
+                    tag = tagOp.get();
+                } else {
+                    tag = new Tag();
+                    tag.setTagName(tagName);
+                }
                 Integer tagId = tagRepository.save(tag).getTagId();
                 tb.setTagId(tagId);
                 tagBoardRepository.save(tb);
