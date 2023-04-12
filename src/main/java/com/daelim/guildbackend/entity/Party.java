@@ -16,5 +16,5 @@ public class Party {
     private Integer total;
     private Integer current;
     @Column(columnDefinition = "TINYINT(1)")
-    private boolean isActive;
+    private Boolean isActive;
 }
