@@ -86,7 +86,6 @@ public class BoardService{
     public List<Map<String, Object>> getAllBoards(Pageable pageable) {
         List<Map<String, Object>> results = new ArrayList<>();
         Page<Board> boards = boardRepository.findAll(pageable);
-
         boards.forEach(board -> {
             Map<String, Object> result = new HashMap<>();
             result.put("board", board);
@@ -99,6 +98,23 @@ public class BoardService{
             results.add(result);
         });
 
+        return results;
+    }
+
+    public List<Map<String, Object>> getBoardsByUserId(Pageable pageable, String userId) {
+        List<Map<String, Object>> results = new ArrayList<>();
+        Page<Board> boards = boardRepository.findByUserId(pageable, userId);
+        boards.forEach(board -> {
+            Map<String, Object> result = new HashMap<>();
+            result.put("board", board);
+            List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(board.getBoardId());
+            List<Tag> tags = new ArrayList<>();
+            tagBoards.forEach(tagBoard -> {
+                tags.add(tagRepository.findById(tagBoard.getTagId()).get());
+            });
+            result.put("tags", tags);
+            results.add(result);
+        });
         return results;
     }
 

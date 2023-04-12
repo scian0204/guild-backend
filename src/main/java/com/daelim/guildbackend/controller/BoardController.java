@@ -36,6 +36,12 @@ public class BoardController {
         return boardService.getAllBoards(pageable);
     }
 
+    // 글 목록 - 유저별
+    @GetMapping("/list/{userId}")
+    public List<Map<String, Object>> getBoardsByUserId(@PageableDefault(page=0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable, @PathVariable String userId) {
+        return boardService.getBoardsByUserId(pageable, userId);
+    }
+
     // 글 상세
     @GetMapping("/{boardId}")
     public Map<String, Object> viewBoard(@PathVariable int boardId) {
