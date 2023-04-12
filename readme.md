@@ -526,4 +526,19 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 </code></td>
 <td><code>-</code></td>
 </tr>
+<tr>
+<td>/isJoin</td>
+<td>POST</td>
+<td>파티 참가 가능 여부 확인</td>
+<td><code>
+{ <br>
+    partyId : Integer, <br>
+    userId : X or String <br>
+} <br>
+</code></td>
+<td><code>
+참가 가능 : True,
+참가 불가능 : False
+</code></td>
+</tr>
 </table>
