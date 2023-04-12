@@ -24,12 +24,16 @@ public class PartyService {
 
     public Integer joinParty(Map<String, Object> partyUserObj) {
         PartyUser pu = objMpr.convertValue(partyUserObj, PartyUser.class);
-        Integer result = partyUserRepository.save(pu).getPartyId();
-
-        Party party = partyRepository.findById(result).get();
-        party.setCurrent(party.getCurrent()+1);
-        partyRepository.save(party);
-
+        Party party = partyRepository.findById(pu.getPartyId()).get();
+        Integer result = null;
+        if (party.getIsActive()) {
+            result = partyUserRepository.save(pu).getPartyId();
+            party.setCurrent(party.getCurrent() + 1);
+            if (party.getTotal() <= party.getCurrent()) {
+                party.setIsActive(false);
+            }
+            partyRepository.save(party);
+        }
         return result;
     }
 
@@ -41,5 +45,15 @@ public class PartyService {
         Party party = partyRepository.findById(pu.getPartyId()).get();
         party.setCurrent(party.getCurrent()-1);
         partyRepository.save(party);
+    }
+
+    public boolean isJoin(Map<String, Object> partyUserObj) {
+        PartyUser pu = objMpr.convertValue(partyUserObj, PartyUser.class);
+        if (pu.getUserId() == null) {
+            Party party = partyRepository.findById(pu.getPartyId()).get();
+            return party.getIsActive();
+        } else {
+            return !(partyUserRepository.findByUserIdAndPartyId(pu.getUserId(), pu.getPartyId()).isPresent());
+        }
     }
 }

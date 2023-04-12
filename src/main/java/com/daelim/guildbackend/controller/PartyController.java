@@ -24,4 +24,9 @@ public class PartyController {
     public void leaveParty(@RequestBody Map<String, Object> partyUserObj) {
         partyService.leaveParty(partyUserObj);
     }
+
+    @PostMapping("/isJoin")
+    public boolean isJoin(@RequestBody Map<String, Object> partyUserObj) {
+        return partyService.isJoin(partyUserObj);
+    }
 }
