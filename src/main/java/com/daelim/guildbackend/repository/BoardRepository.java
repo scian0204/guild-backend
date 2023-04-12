@@ -13,4 +13,6 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
     List<Board> findByTitleLikeIgnoreCaseOrContentLikeIgnoreCase(String title, String content);
 
     Page<Board> findByUserId(Pageable pageable, String userId);
+
+    Board findByPartyId(Integer partyId);
 }
