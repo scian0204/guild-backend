@@ -216,7 +216,6 @@ UserId가 중복이 아닐때 : false<br>
     title : String, <br>
     content : String, <br>
     total : Integer, <br>
-    current : Integer, <br>
     tagId : X or [Integer, Integer ...], <br>
     tagName : X or [String, String, ...], <br>
 }
@@ -224,7 +223,7 @@ UserId가 중복이 아닐때 : false<br>
 <td>게시물 작성 성공 : boardId</td>
 </tr>
 <tr>
-<td>/list(/ASC)</td>
+<td>/list(/ASC) or (/{userId})</td>
 <td>GET</td>
 <td>게시물 리스트 조회</td>
 <td> 
@@ -334,7 +333,6 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
     tagId : X or [Integer, Integer, ...], <br>
     tagName : X or [String, String, ...], <br>
     total : X or Integer, <br>
-    current : X or Integer, <br>
 }
 </code></td>
 <td>-</td>
