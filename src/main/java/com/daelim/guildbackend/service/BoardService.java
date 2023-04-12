@@ -74,6 +74,16 @@ public class BoardService{
                 Optional<Tag> tagOp = tagRepository.findByTagName(tagName);
                 Tag tag = null;
                 if (tagOp.isPresent()){
+                    boolean flag = false;
+                    for (Integer tagId :
+                            tagIds) {
+                        if (tagOp.get().getTagId() == tagId) {
+                            flag = true;
+                        }
+                    }
+                    if (flag) {
+                        continue;
+                    }
                     tag = tagOp.get();
                 } else {
                     tag = new Tag();
