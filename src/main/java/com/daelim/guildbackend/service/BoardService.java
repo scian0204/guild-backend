@@ -143,11 +143,11 @@ public class BoardService{
         Map<String, Object> resultMap = new HashMap<>();
         board.setViews(board.getViews() + 1);
         boardRepository.save(board);
-        resultMap.put("Board", board);
+        resultMap.put("board", board);
 
         // Party
         Party party = partyRepository.findById(board.getPartyId()).get();
-        resultMap.put("Party", party);
+        resultMap.put("party", party);
 
         // List<Tag> - baordId로 tagBoard에서 목록 가져온 후 forEach를 이용하여 tagBoard의 tagId를 하나하나 검색하여 Tag 리스트에 삽입
         List<Tag> tags = new ArrayList<>();
@@ -155,7 +155,7 @@ public class BoardService{
         tagBoards.forEach((tagBoard)->{
             tags.add(tagRepository.findById(tagBoard.getTagId()).get());
         });
-        resultMap.put("Tags", tags);
+        resultMap.put("tags", tags);
 
         return resultMap;
     }
