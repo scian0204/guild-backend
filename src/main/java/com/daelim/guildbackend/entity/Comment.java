@@ -2,6 +2,7 @@ package com.daelim.guildbackend.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -20,6 +21,6 @@ public class Comment {
     private Integer target;
     private String comment;
     @Column(columnDefinition = "TINYINT(1)")
-    private boolean isPublic;
+    private Boolean isPublic;
     private Timestamp writeDate;
 }
