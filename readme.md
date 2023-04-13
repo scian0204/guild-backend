@@ -216,7 +216,6 @@ UserId가 중복이 아닐때 : false<br>
     title : String, <br>
     content : String, <br>
     total : Integer, <br>
-    tagId : X or [Integer, Integer ...], <br>
     tagName : X or [String, String, ...], <br>
 }
 </code></td>
@@ -290,7 +289,7 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 </code></td>
 <td><code>
 {
-    Board : { <br>
+    board : { <br>
         baordId : Integer, <br>
         userId : String, <br>
         title : String, <br>
@@ -299,13 +298,13 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
         view : Integer, <br>
         writeDate : Timestamp <br>
     }, <br>
-    Party : { <br>
+    party : { <br>
         partyId : Integer, <br>
         total : Integer, <br>
         current : Integer, <br>
         isActive : boolean, <br>
     }, <br>
-    Tags : [ <br>
+    tags : [ <br>
         { <br>
             tagId : Integer <br>
             tagName : String <br>
