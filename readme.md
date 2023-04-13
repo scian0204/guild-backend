@@ -599,3 +599,70 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 </code></td>
 </tr>
 </table>
+
+<hr/>
+/api/comment
+<table>
+    <tr>
+        <th>URL</th>
+        <th>Method</th>
+        <th>설명</th>
+        <th>request</th>
+        <th>response</th>
+    </tr>
+    <tr>
+        <td>/insert/{boardId}</td>
+        <td>POST</td>
+        <td>댓글 작성</td>
+        <td> <code>
+            { <br>
+                boardId : Integer, <br> &emsp;
+                userId : String, <br> &emsp;
+                comment : String, <br>
+            }
+        </code> </td>
+        <td>commentId</td>
+    </tr>
+    <tr>
+        <td>/list/{boardId}</td>
+        <td>GET</td>
+        <td>게시글별 댓글 목록</td>
+        <td> <code>
+            { <br>
+                boardId : Integer, <br>
+            }
+        </code> </td>
+        <td>
+            -
+        </td>
+    </tr>
+    <tr>
+        <td>/{cmtId}</td>
+        <td>POST</td>
+        <td>댓글 삭제</td>
+        <td> <code>
+            { <br>
+                cmtId : Integer, <br>
+	            userId : String, <br>
+            }
+        </code> </td>
+        <td>
+            삭제 성공 : "1" <br> 실패 시 : "0"
+        </td>
+    </tr>
+    <tr>
+        <td>/{cmtId}</td>
+        <td>PUT</td>
+        <td>댓글 수정</td>
+        <td> <code>
+            { <br>
+                cmtId : Integer, <br>
+	            userId : String, <br>
+	            comment : String, <br>
+            }
+        </code> </td>
+        <td>
+            -
+        </td>
+    </tr>
+</table>
