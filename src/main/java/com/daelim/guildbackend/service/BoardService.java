@@ -69,10 +69,26 @@ public class BoardService{
             System.out.println(tagNames);
             for (String tagName :
                     tagNames) {
-                Tag tag = new Tag();
                 TagBoard tb = new TagBoard();
                 tb.setBoardId(boardId);
-                tag.setTagName(tagName);
+                Optional<Tag> tagOp = tagRepository.findByTagName(tagName);
+                Tag tag = null;
+                if (tagOp.isPresent()){
+                    boolean flag = false;
+                    for (Integer tagId :
+                            tagIds) {
+                        if (tagOp.get().getTagId() == tagId) {
+                            flag = true;
+                        }
+                    }
+                    if (flag) {
+                        continue;
+                    }
+                    tag = tagOp.get();
+                } else {
+                    tag = new Tag();
+                    tag.setTagName(tagName);
+                }
                 Integer tagId = tagRepository.save(tag).getTagId();
                 tb.setTagId(tagId);
                 tagBoardRepository.save(tb);
@@ -86,7 +102,6 @@ public class BoardService{
     public List<Map<String, Object>> getAllBoards(Pageable pageable) {
         List<Map<String, Object>> results = new ArrayList<>();
         Page<Board> boards = boardRepository.findAll(pageable);
-
         boards.forEach(board -> {
             Map<String, Object> result = new HashMap<>();
             result.put("board", board);
@@ -102,6 +117,23 @@ public class BoardService{
         return results;
     }
 
+    public List<Map<String, Object>> getBoardsByUserId(Pageable pageable, String userId) {
+        List<Map<String, Object>> results = new ArrayList<>();
+        Page<Board> boards = boardRepository.findByUserId(pageable, userId);
+        boards.forEach(board -> {
+            Map<String, Object> result = new HashMap<>();
+            result.put("board", board);
+            List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(board.getBoardId());
+            List<Tag> tags = new ArrayList<>();
+            tagBoards.forEach(tagBoard -> {
+                tags.add(tagRepository.findById(tagBoard.getTagId()).get());
+            });
+            result.put("tags", tags);
+            results.add(result);
+        });
+        return results;
+    }
+
     public Map<String, Object> viewBoard(Integer boardId) { //게시물 상세 페이지
         // Board - boardId로 검색 후 조회수 + 1
         Board board = boardRepository.findById(boardId).get();
@@ -111,11 +143,11 @@ public class BoardService{
         Map<String, Object> resultMap = new HashMap<>();
         board.setViews(board.getViews() + 1);
         boardRepository.save(board);
-        resultMap.put("Board", board);
+        resultMap.put("board", board);
 
         // Party
         Party party = partyRepository.findById(board.getPartyId()).get();
-        resultMap.put("Party", party);
+        resultMap.put("party", party);
 
         // List<Tag> - baordId로 tagBoard에서 목록 가져온 후 forEach를 이용하여 tagBoard의 tagId를 하나하나 검색하여 Tag 리스트에 삽입
         List<Tag> tags = new ArrayList<>();
@@ -123,7 +155,7 @@ public class BoardService{
         tagBoards.forEach((tagBoard)->{
             tags.add(tagRepository.findById(tagBoard.getTagId()).get());
         });
-        resultMap.put("Tags", tags);
+        resultMap.put("tags", tags);
 
         return resultMap;
     }

@@ -216,15 +216,13 @@ UserId가 중복이 아닐때 : false<br>
     title : String, <br>
     content : String, <br>
     total : Integer, <br>
-    current : Integer, <br>
-    tagId : X or [Integer, Integer ...], <br>
     tagName : X or [String, String, ...], <br>
 }
 </code></td>
 <td>게시물 작성 성공 : boardId</td>
 </tr>
 <tr>
-<td>/list(/ASC)</td>
+<td>/list(/ASC) or (/{userId})</td>
 <td>GET</td>
 <td>게시물 리스트 조회</td>
 <td> 
@@ -291,7 +289,7 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 </code></td>
 <td><code>
 {
-    Board : { <br>
+    board : { <br>
         baordId : Integer, <br>
         userId : String, <br>
         title : String, <br>
@@ -300,13 +298,13 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
         view : Integer, <br>
         writeDate : Timestamp <br>
     }, <br>
-    Party : { <br>
+    party : { <br>
         partyId : Integer, <br>
         total : Integer, <br>
         current : Integer, <br>
         isActive : boolean, <br>
     }, <br>
-    Tags : [ <br>
+    tags : [ <br>
         { <br>
             tagId : Integer <br>
             tagName : String <br>
@@ -334,7 +332,6 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
     tagId : X or [Integer, Integer, ...], <br>
     tagName : X or [String, String, ...], <br>
     total : X or Integer, <br>
-    current : X or Integer, <br>
 }
 </code></td>
 <td>-</td>
@@ -527,5 +524,78 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 } <br>
 </code></td>
 <td><code>-</code></td>
+</tr>
+<tr>
+<td>/isJoin</td>
+<td>POST</td>
+<td>파티 참가 가능 여부 확인</td>
+<td><code>
+{ <br>
+    partyId : Integer, <br>
+    userId : X or String <br>
+} <br>
+</code></td>
+<td><code>
+참가 가능 : True,
+참가 불가능 : False
+</code></td>
+</tr>
+<tr>
+<td>/{userId}</td>
+<td>GET</td>
+<td>유저별 참가 파티의 게시물 리스트 조회</td>
+<td>
+page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br> 
+예) /{userId}?page=0&size=15
+</td>
+<td><code>
+[<br>
+    {<br>
+        board : {<br>
+            boardId : integeer,<br>
+            userId : String,<br>
+            title : String,<br>
+            content : String,<br>
+            partyId : Integer,<br>
+            views : Integer,<br>
+            writeDate : TimeStamp<br>
+        },<br>
+        tags : [<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            ...<br>
+        ]<br>
+    },<br>
+    {<br>
+        board : {<br>
+            boardId : integeer,<br>
+            userId : String,<br>
+            title : String,<br>
+            content : String,<br>
+            partyId : Integer,<br>
+            views : Integer,<br>
+            writeDate : TimeStamp<br>
+        },<br>
+        tags : [<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            {<br>
+                tagId : Integer,<br>
+                tagName : String<br>
+            },<br>
+            ...<br>
+        ]<br>
+    },<br>
+    ...<br>
+]<br>
+</code></td>
 </tr>
 </table>
