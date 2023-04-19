@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tag")
@@ -19,5 +20,10 @@ public class TagController {
     @GetMapping("/{tagName}")
     public List<Tag> getListbyTagName(@PathVariable String tagName) {
         return tagService.getListbyTagName(tagName);
+    }
+
+    @GetMapping("/rank")
+    public List<Map<String, Object>> getTagsByRank() {
+        return tagService.getTagsByRank();
     }
 }
