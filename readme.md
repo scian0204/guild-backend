@@ -489,6 +489,31 @@ page={요청할 페이지} size={한 페이지당 보여줄 게시글 수} <br>
 ]<br>
 </code></td>
 </tr>
+<tr>
+<td>/rank</td>
+<td>GET</td>
+<td>가장 많이 사용된 순으로 태그목록 검색(20개)</td>
+<td><code>-</code></td>
+<td><code>
+[<br>
+    {<br>
+        cnt : Integer,<br>
+        tag : {<br>
+            tagId : Integer,<br>
+            tagName : String<br>
+        }<br>
+    },<br>
+    {<br>
+        cnt : Integer,<br>
+        tag : {<br>
+            tagId : Integer,<br>
+            tagName : String<br>
+        }<br>
+    },<br>
+    ...<br>
+]<br>
+</code></td>
+</tr>
 </table>
 
 <hr/>
