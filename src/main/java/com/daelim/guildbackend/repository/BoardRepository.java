@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Integer> {
-    List<Board> findByTitleLikeIgnoreCaseOrContentLikeIgnoreCase(String title, String content);
+    List<Board> findByTitleLikeIgnoreCaseOrContentLikeIgnoreCase(Pageable pageable, String title, String content);
 
     Page<Board> findByUserId(Pageable pageable, String userId);
 
