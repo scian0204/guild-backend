@@ -1,6 +1,7 @@
 package com.daelim.guildbackend.controller;
 
 import com.daelim.guildbackend.service.PartyService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "Party", description = "파티 API")
 @RestController
 @RequestMapping("/api/party")
 public class PartyController {

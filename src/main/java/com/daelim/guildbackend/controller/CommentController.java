@@ -2,12 +2,14 @@ package com.daelim.guildbackend.controller;
 
 import com.daelim.guildbackend.entity.Comment;
 import com.daelim.guildbackend.service.CommentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Tag(name = "Comment", description = "댓글 API")
 @RestController
 @RequestMapping("/api/comment")
 public class CommentController {

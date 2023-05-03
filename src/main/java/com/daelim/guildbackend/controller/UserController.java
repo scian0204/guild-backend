@@ -1,6 +1,7 @@
 package com.daelim.guildbackend.controller;
 
 import com.daelim.guildbackend.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+@Tag(name = "User", description = "유저 API")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {

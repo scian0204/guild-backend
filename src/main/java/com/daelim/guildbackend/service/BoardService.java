@@ -1,5 +1,6 @@
 package com.daelim.guildbackend.service;
 
+import com.daelim.guildbackend.controller.responseObject.BoardListResponse;
 import com.daelim.guildbackend.entity.*;
 import com.daelim.guildbackend.repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -99,36 +100,36 @@ public class BoardService{
         return boardId;
     }
 
-    public List<Map<String, Object>> getAllBoards(Pageable pageable) {
-        List<Map<String, Object>> results = new ArrayList<>();
+    public List<BoardListResponse> getAllBoards(Pageable pageable) {
+        List<BoardListResponse> results = new ArrayList<>();
         Page<Board> boards = boardRepository.findAll(pageable);
         boards.forEach(board -> {
-            Map<String, Object> result = new HashMap<>();
-            result.put("board", board);
+            BoardListResponse result = new BoardListResponse();
+            result.setBoard(board);
             List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(board.getBoardId());
             List<Tag> tags = new ArrayList<>();
             tagBoards.forEach(tagBoard -> {
                 tags.add(tagRepository.findById(tagBoard.getTagId()).get());
             });
-            result.put("tags", tags);
+            result.setTags(tags);
             results.add(result);
         });
 
         return results;
     }
 
-    public List<Map<String, Object>> getBoardsByUserId(Pageable pageable, String userId) {
-        List<Map<String, Object>> results = new ArrayList<>();
+    public List<BoardListResponse> getBoardsByUserId(Pageable pageable, String userId) {
+        List<BoardListResponse> results = new ArrayList<>();
         Page<Board> boards = boardRepository.findByUserId(pageable, userId);
         boards.forEach(board -> {
-            Map<String, Object> result = new HashMap<>();
-            result.put("board", board);
+            BoardListResponse result = new BoardListResponse();
+            result.setBoard(board);
             List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(board.getBoardId());
             List<Tag> tags = new ArrayList<>();
             tagBoards.forEach(tagBoard -> {
                 tags.add(tagRepository.findById(tagBoard.getTagId()).get());
             });
-            result.put("tags", tags);
+            result.setTags(tags);
             results.add(result);
         });
         return results;
@@ -225,19 +226,19 @@ public class BoardService{
         }
     }
 
-    public List<Map<String, Object>> searchBoard(String text) {
-        List<Map<String, Object>> results = new ArrayList<>();
+    public List<BoardListResponse> searchBoard(Pageable pageable, String text) {
+        List<BoardListResponse> results = new ArrayList<>();
 
-        List<Board> boards = boardRepository.findByTitleLikeIgnoreCaseOrContentLikeIgnoreCase("%" + text + "%", "%" + text + "%");
+        List<Board> boards = boardRepository.findByTitleLikeIgnoreCaseOrContentLikeIgnoreCase(pageable, "%" + text + "%", "%" + text + "%");
         boards.forEach(board -> {
-            Map<String, Object> result = new HashMap<>();
-            result.put("board", board);
+            BoardListResponse result = new BoardListResponse();
+            result.setBoard(board);
             List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(board.getBoardId());
             List<Tag> tags = new ArrayList<>();
             tagBoards.forEach(tagBoard -> {
                 tags.add(tagRepository.findById(tagBoard.getTagId()).get());
             });
-            result.put("tags", tags);
+            result.setTags(tags);
 
             results.add(result);
         });
@@ -245,18 +246,18 @@ public class BoardService{
         return results;
     }
 
-    public List<Map<String, Object>> searchBoardByTagId(Integer tagId) {
-        List<Map<String, Object>> results = new ArrayList<>();
-        List<TagBoard> tagBoards = tagBoardRepository.findByTagId(tagId);
+    public List<BoardListResponse> searchBoardByTagId(Pageable pageable, Integer tagId) {
+        List<BoardListResponse> results = new ArrayList<>();
+        List<TagBoard> tagBoards = tagBoardRepository.findByTagId(pageable, tagId);
         tagBoards.forEach(tagBoard -> {
-            Map<String, Object> result = new HashMap<>();
-            result.put("board", boardRepository.findById(tagBoard.getBoardId()).get());
+            BoardListResponse result = new BoardListResponse();
+            result.setBoard(boardRepository.findById(tagBoard.getBoardId()).get());
             List<TagBoard> tagBoards1 = tagBoardRepository.findByBoardId(tagBoard.getBoardId());
             List<Tag> tags = new ArrayList<>();
             tagBoards1.forEach(tagBoard1 -> {
                 tags.add(tagRepository.findById(tagBoard1.getTagId()).get());
             });
-            result.put("tags", tags);
+            result.setTags(tags);
 
             results.add(result);
         });
