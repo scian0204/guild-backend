@@ -104,6 +104,8 @@ CREATE TABLE `TagBoard` (
 
 
 ## API 표
+- 서버실행 후 http://localhost:8080/swagger-ui/index.html#/ 접속 
+
 /api/users
 <table>
 <tr>
