@@ -1,5 +1,6 @@
 package com.daelim.guildbackend.service;
 
+import com.daelim.guildbackend.controller.responseObject.TagRankResponse;
 import com.daelim.guildbackend.entity.Tag;
 import com.daelim.guildbackend.repository.TagRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,19 +23,19 @@ public class TagService {
         return tagRepository.findByTagNameLikeIgnoreCase("%"+tagName+"%");
     }
 
-    public List<Map<String, Object>> getTagsByRank() {
-        List<Map<String, Object>> results = new ArrayList<>();
+    public List<TagRankResponse> getTagsByRank() {
+        List<TagRankResponse> results = new ArrayList<>();
         List<Object> objs = tagRepository.getTagsByRank();
 
         objs.forEach((obj)->{
-            Map<String, Object> result = new HashMap<>();
+            TagRankResponse result = new TagRankResponse();
             List<Object> objList = objMpr.convertValue(obj, List.class);
             Integer cnt = Integer.parseInt(objList.get(2).toString());
             Tag tag = new Tag();
-            tag.setTagId(Integer.parseInt(objList.get(2).toString()));
+            tag.setTagId(Integer.parseInt(objList.get(0).toString()));
             tag.setTagName(objList.get(1).toString());
-            result.put("tag", tag);
-            result.put("cnt", cnt);
+            result.setTag(tag);
+            result.setCnt(cnt);
             results.add(result);
         });
 

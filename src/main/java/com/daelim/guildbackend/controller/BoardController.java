@@ -88,7 +88,7 @@ public class BoardController {
 
     // 글 삭제
     @Operation(summary = "게시글 삭제")
-    @ApiResponse(description = "삭제 성공 : 0 || userId 일치하지 않음 : 1")
+    @ApiResponse(description = "삭제 성공 : 0<br>userId 일치하지 않음 : 1")
     @PostMapping("/delete")
     public String deleteBoardPost(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(

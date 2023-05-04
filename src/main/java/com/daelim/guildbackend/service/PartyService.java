@@ -1,5 +1,6 @@
 package com.daelim.guildbackend.service;
 
+import com.daelim.guildbackend.controller.responseObject.BoardListResponse;
 import com.daelim.guildbackend.entity.*;
 import com.daelim.guildbackend.repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,22 +66,22 @@ public class PartyService {
         }
     }
 
-    public List<Map<String, Object>> getUserJoinParty(Pageable pageable, String userId) {
-        List<Map<String, Object>> results = new ArrayList<>();
+    public List<BoardListResponse> getUserJoinParty(Pageable pageable, String userId) {
+        List<BoardListResponse> results = new ArrayList<>();
         Page<PartyUser> pu = partyUserRepository.findByUserId(pageable, userId);
         List<Board> boards = new ArrayList<>();
         pu.forEach(partyUser -> {
             boards.add(boardRepository.findByPartyId(partyUser.getPartyId()));
         });
         boards.forEach(board -> {
-            Map<String, Object> result = new HashMap<>();
-            result.put("board", board);
+            BoardListResponse result = new BoardListResponse();
+            result.setBoard(board);
             List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(board.getBoardId());
             List<Tag> tags = new ArrayList<>();
             tagBoards.forEach(tagBoard -> {
                 tags.add(tagRepository.findById(tagBoard.getTagId()).get());
             });
-            result.put("tags", tags);
+            result.setTags(tags);
             results.add(result);
         });
         return results;
