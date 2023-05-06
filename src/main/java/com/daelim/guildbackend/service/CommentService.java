@@ -1,13 +1,16 @@
 package com.daelim.guildbackend.service;
 
+import com.daelim.guildbackend.controller.requestObject.CommentDeleteRequest;
 import com.daelim.guildbackend.entity.Comment;
 import com.daelim.guildbackend.repository.CommentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,30 +21,27 @@ public class CommentService {
     CommentRepository commentRepository;
 
     // 게시글별 댓글 목록
-    public Comment viewComment(Integer boardId) {
-        return commentRepository.findById(boardId).get();
+    public List<Comment> viewComment(Pageable pageable, Integer boardId) {
+        return commentRepository.findAllByBoardId(pageable, boardId);
     }
 
     // 댓글 작성
     public Integer writeComment(Map<String, Object> commentObj) {
         Comment comment = objMpr.convertValue(commentObj, Comment.class);
-        Integer commentId = commentRepository.save(comment).getBoardId();
+        Integer commentId = commentRepository.save(comment).getCmtId();
 
         return commentId;
     }
 
     // 댓글 삭제
-    public String deleteComment(Map<String, Object> commentObj, HttpSession session) throws Exception {
-        Integer cmtId = Integer.parseInt((String) commentObj.get("cmtId"));
-        String userId = (String) commentObj.get("userId");
+    public Boolean deleteComment(Map<String, Object> commentObj, HttpSession session) throws Exception {
+        CommentDeleteRequest cdr = objMpr.convertValue(commentObj, CommentDeleteRequest.class);
 
-//        session.setAttribute("userId", "test");
-
-        if (session.getAttribute("userId") != null && session.getAttribute("userId").equals(userId)) {
-            commentRepository.deleteById(cmtId);
-            return "0";
+        if (session.getAttribute("userId") != null && session.getAttribute("userId").equals(cdr.getUserId())) {
+            commentRepository.deleteById(cdr.getCmtId());
+            return true;
         } else {
-            return "1";
+            return false;
         }
     }
 
@@ -49,14 +49,10 @@ public class CommentService {
     public void updateComment(Map<String, Object> commentObj, HttpSession session) throws Exception {
         Comment comment = objMpr.convertValue(commentObj, Comment.class);
 
-//        session.setAttribute("userId", "test");
-
         if (session.getAttribute("userId") != null && session.getAttribute("userId").equals(comment.getUserId())) {
-            Optional<Comment> optComment = commentRepository.findById(comment.getCmtId());
-//            Comment comment1 = optComment.get();
-            Comment comment1 = new Comment();
-            comment.setComment(comment1.getComment());
-
+            Comment comment1 = commentRepository.findByCmtId(comment.getCmtId());
+            comment.setWriteDate(comment1.getWriteDate());
+            comment.setIsPublic(comment1.getIsPublic());
             commentRepository.save(comment);
         }
     }
