@@ -171,16 +171,15 @@ public class BoardService{
             String[] tagNames = g.fromJson(boardObj.get("tagName")+"", String[].class);
             Integer total = null;
             Integer boardId = (Integer) boardObj.get("boardId");
-            TagBoard tb = new TagBoard();
-            tb.setBoardId(boardId);
 
             if (updateTagIds != null) {
                 tagBoardRepository.deleteAllByBoardId(boardId);
                 for (Integer tagId:
                      updateTagIds) {
+                    TagBoard tb = new TagBoard();
+                    tb.setBoardId(boardId);
                     tb.setTagId(tagId);
                     tagBoardRepository.save(tb);
-                    tb.setIdx(null);
                 }
             }
             if (tagNames != null) {
@@ -213,19 +212,21 @@ public class BoardService{
                 }
                 boardObj.remove("tagName");
             }
-            Party party = partyRepository.findById((Integer) boardObj.get("partyId")).get();
-            if (boardObj.get("total") != null) {
-                total = (Integer) boardObj.get("total");
-                party.setTotal(total);
-                partyRepository.save(party);
-                boardObj.remove("total");
-            }
             Board board = objMpr.convertValue(boardObj, Board.class);
 
             //board
             Board board1 = boardRepository.findById(board.getBoardId()).get();
             board.setWriteDate(board1.getWriteDate());
             board.setViews(board1.getViews());
+            board.setPartyId(board1.getPartyId());
+
+            Party party = partyRepository.findById(board.getPartyId()).get();
+            if (boardObj.get("total") != null) {
+                total = (Integer) boardObj.get("total");
+                party.setTotal(total);
+                partyRepository.save(party);
+                boardObj.remove("total");
+            }
 
             boardRepository.save(board);
         }
