@@ -62,7 +62,7 @@ public class PartyController {
 //        return partyService.isJoin(partyUserObj);
 //    }
 
-    @Operation(summary = "유저별 가입한 파티 목록 - 오름차순")
+    @Operation(summary = "유저별 가입한 파티 목록 - 내림차순")
     @GetMapping("/{userId}")
     public List<BoardListResponse> getUserJoinParty(@PageableDefault(page=0, size = 10, sort = "partyId", direction = Sort.Direction.DESC) Pageable pageable, @PathVariable String userId) {
         return partyService.getUserJoinParty(pageable, userId);
