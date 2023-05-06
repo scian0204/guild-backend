@@ -1,5 +1,6 @@
 package com.daelim.guildbackend.service;
 
+import com.daelim.guildbackend.controller.requestObject.BoardDeleteRequest;
 import com.daelim.guildbackend.controller.responseObject.BoardListResponse;
 import com.daelim.guildbackend.entity.*;
 import com.daelim.guildbackend.repository.*;
@@ -87,11 +88,13 @@ public class BoardService{
                     }
                     tag = tagOp.get();
                 } else {
+                    Integer tagId = null;
                     tag = new Tag();
                     tag.setTagName(tagName);
+                    tagId = tagRepository.save(tag).getTagId();
+                    tag.setTagId(tagId);
                 }
-                Integer tagId = tagRepository.save(tag).getTagId();
-                tb.setTagId(tagId);
+                tb.setTagId(tag.getTagId());
                 tagBoardRepository.save(tb);
             }
         }
@@ -181,16 +184,32 @@ public class BoardService{
                 }
             }
             if (tagNames != null) {
-                Tag tag = new Tag();
-                Integer tagId = null;
                 for (String tagName :
                         tagNames) {
-                    tag.setTagName(tagName);
-                    tagId = tagRepository.save(tag).getTagId();
-                    tag.setTagId(null);
-                    tb.setTagId(tagId);
-                    tagBoardRepository.save(tb);
-                    tb.setIdx(null);
+                    TagBoard tb2 = new TagBoard();
+                    tb2.setBoardId(boardId);
+                    Optional<Tag> tagOp = tagRepository.findByTagName(tagName);
+                    Tag tag = null;
+                    if (tagOp.isPresent()){
+                        boolean flag = false;
+                        for (Integer tagId :
+                                updateTagIds) {
+                            if (tagOp.get().getTagId() == tagId) {
+                                flag = true;
+                            }
+                        }
+                        if (flag) {
+                            continue;
+                        }
+                        tag = tagOp.get();
+                    } else {
+                        tag = new Tag();
+                        tag.setTagName(tagName);
+                        Integer tagId = tagRepository.save(tag).getTagId();
+                        tag.setTagId(tagId);
+                    }
+                    tb2.setTagId(tag.getTagId());
+                    tagBoardRepository.save(tb2);
                 }
                 boardObj.remove("tagName");
             }
@@ -213,12 +232,11 @@ public class BoardService{
     }
 
     public String deleteBoardPost(Map<String, Object> boardObj, HttpSession session) { //게시물 삭제
-        Integer boardId = (Integer) boardObj.get("boardId");
-        String userId = (String) boardObj.get("userId");
+        BoardDeleteRequest bdr = objMpr.convertValue(boardObj, BoardDeleteRequest.class);
 
-        if (session.getAttribute("userId") != null && session.getAttribute("userId").equals(userId)) {
-            tagBoardRepository.deleteAllByBoardId(boardId);
-            boardRepository.deleteById(boardId);
+        if (session.getAttribute("userId") != null && session.getAttribute("userId").equals(bdr.getUserId())) {
+            tagBoardRepository.deleteAllByBoardId(bdr.getBoardId());
+            boardRepository.deleteById(bdr.getBoardId());
             partyRepository.deleteById((Integer) boardObj.get("partyId"));
             return "0"; //userId 동일 = 삭제됨
         } else {
