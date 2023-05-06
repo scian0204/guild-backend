@@ -60,7 +60,7 @@ public class BoardController {
 
     // 글 목록 - 유저별
     @GetMapping("/list/{userId}")
-    @Operation(summary = "유저별 게시글 목록 요청 - 오름차순")
+    @Operation(summary = "유저별 게시글 목록 요청 - 내림차순")
     public List<BoardListResponse> getBoardsByUserId(@PageableDefault(page=0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable, @PathVariable String userId) {
         return boardService.getBoardsByUserId(pageable, userId);
     }
@@ -80,7 +80,8 @@ public class BoardController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = {
                             @Content(schema = @Schema(implementation = BoardUpdateRequest.class))
-                    }
+                    },
+                    description = "태그 수정시 주의사항:<br>태그 추가 시 tagName 배열에 추가할 것<br>기존 태그의 삭제 여부와 상관없이 그대로 tagId 배열에 넣을 것<br>ex)현재글의 태그 목록 [1, 2, 3]에서 3을 삭제 후 '게임' 태그 추가시 -> tagId[1, 2], tagName['게임']"
             )
             @RequestBody Map<String,Object> boardObj, HttpSession session) {
         boardService.updateBoard(boardObj, session);
@@ -99,13 +100,13 @@ public class BoardController {
     }
 
     // 글 검색
-    @Operation(summary = "제목 및 내용으로 게시글 검색 - 오름차순")
+    @Operation(summary = "제목 및 내용으로 게시글 검색 - 내림차순")
     @GetMapping("/search/{text}")
     public List<BoardListResponse> searchBoard(@PageableDefault(page=0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable, @PathVariable String text) {
         return boardService.searchBoard(pageable, text);
     }
 
-    @Operation(summary = "태그id로 게시글 검색 - 오름차순")
+    @Operation(summary = "태그id로 게시글 검색 - 내림차순")
     @GetMapping("/searchByTagId/{tagId}")
     public List<BoardListResponse> searchBoardByTagId(@PageableDefault(page=0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable, @PathVariable Integer tagId) {
         return boardService.searchBoardByTagId(pageable, tagId);
