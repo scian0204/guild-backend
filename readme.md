@@ -106,3 +106,4 @@ CREATE TABLE `TagBoard` (
 ## API 표
 ### Swagger로 대체
 - 서버실행 후 http://localhost:8080/swagger-ui/index.html#/ 접속 
+- http://guild-api.kro.kr:8088/docs/ 접속
