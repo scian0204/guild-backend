@@ -1,4 +1,4 @@
-package com.daelim.guildbackend.controller.requestObject;
+package com.daelim.guildbackend.dto.request;
 
 import lombok.Data;
 

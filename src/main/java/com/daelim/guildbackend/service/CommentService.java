@@ -1,6 +1,6 @@
 package com.daelim.guildbackend.service;
 
-import com.daelim.guildbackend.controller.requestObject.CommentDeleteRequest;
+import com.daelim.guildbackend.dto.request.CommentDeleteRequest;
 import com.daelim.guildbackend.entity.Comment;
 import com.daelim.guildbackend.repository.CommentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,10 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class CommentService {

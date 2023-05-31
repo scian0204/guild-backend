@@ -1,4 +1,4 @@
-package com.daelim.guildbackend.controller.responseObject;
+package com.daelim.guildbackend.dto.response;
 
 import com.daelim.guildbackend.entity.Tag;
 import lombok.Data;

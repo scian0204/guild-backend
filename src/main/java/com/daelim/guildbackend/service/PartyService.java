@@ -1,6 +1,8 @@
 package com.daelim.guildbackend.service;
 
-import com.daelim.guildbackend.controller.responseObject.BoardListResponse;
+import com.daelim.guildbackend.dto.response.BoardListResponse;
+import com.daelim.guildbackend.dto.response.Error;
+import com.daelim.guildbackend.dto.response.Response;
 import com.daelim.guildbackend.entity.*;
 import com.daelim.guildbackend.repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,9 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -31,22 +33,41 @@ public class PartyService {
     @Autowired
     TagRepository tagRepository;
 
-    public Integer joinParty(Map<String, Object> partyUserObj) {
+    public Response<Integer> joinParty(Map<String, Object> partyUserObj) {
+        Response<Integer> res = new Response<>();
         PartyUser pu = objMpr.convertValue(partyUserObj, PartyUser.class);
-        Party party = partyRepository.findById(pu.getPartyId()).get();
+        Optional<Party> partyOps = partyRepository.findById(pu.getPartyId());
         Integer result = null;
-        if (party.getIsActive()) {
-            result = partyUserRepository.save(pu).getPartyId();
-            party.setCurrent(party.getCurrent() + 1);
-            if (party.getTotal() <= party.getCurrent()) {
-                party.setIsActive(false);
+
+        if (partyOps.isPresent()) {
+            Party party = partyOps.get();
+            if (party.getIsActive()) {
+                result = partyUserRepository.save(pu).getPartyId();
+                party.setCurrent(party.getCurrent() + 1);
+                if (party.getTotal() <= party.getCurrent()) {
+                    party.setIsActive(false);
+                }
+                partyRepository.save(party);
+            } else {
+                Error error = new Error();
+                error.setErrorId(1);
+                error.setMessage("파티가 비활성화 상태임");
+                res.setError(error);
             }
-            partyRepository.save(party);
+        } else {
+            Error error = new Error();
+            error.setErrorId(0);
+            error.setMessage("해당 파티가 존재하지 않음");
+            res.setError(error);
         }
-        return result;
+
+        res.setData(result);
+
+        return res;
     }
 
-    public void leaveParty(Map<String, Object> partyUserObj) {
+    public Response<Object> leaveParty(Map<String, Object> partyUserObj) {
+        Response<Object> res = new Response<>();
         PartyUser pu = objMpr.convertValue(partyUserObj, PartyUser.class);
 
         partyUserRepository.delete(pu);
@@ -54,6 +75,8 @@ public class PartyService {
         Party party = partyRepository.findById(pu.getPartyId()).get();
         party.setCurrent(party.getCurrent()-1);
         partyRepository.save(party);
+
+        return res;
     }
 
     public boolean isJoin(Map<String, Object> partyUserObj) {
@@ -66,24 +89,21 @@ public class PartyService {
         }
     }
 
-    public List<BoardListResponse> getUserJoinParty(Pageable pageable, String userId) {
-        List<BoardListResponse> results = new ArrayList<>();
-        Page<PartyUser> pu = partyUserRepository.findByUserId(pageable, userId);
-        List<Board> boards = new ArrayList<>();
-        pu.forEach(partyUser -> {
-            boards.add(boardRepository.findByPartyId(partyUser.getPartyId()));
-        });
-        boards.forEach(board -> {
-            BoardListResponse result = new BoardListResponse();
-            result.setBoard(board);
-            List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(board.getBoardId());
+    public Response<Page<BoardListResponse>> getUserJoinParty(Pageable pageable, String userId) {
+        Response<Page<BoardListResponse>> res = new Response<>();
+        Page<Board> boards = boardRepository.findPartyByUserId(pageable, userId);
+        Page<BoardListResponse> results = new BoardListResponse().toDtoList(boards);
+        results.forEach(result -> {
+            List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(result.getBoard().getBoardId());
             List<Tag> tags = new ArrayList<>();
             tagBoards.forEach(tagBoard -> {
                 tags.add(tagRepository.findById(tagBoard.getTagId()).get());
             });
             result.setTags(tags);
-            results.add(result);
         });
-        return results;
+
+        res.setData(results);
+
+        return res;
     }
 }

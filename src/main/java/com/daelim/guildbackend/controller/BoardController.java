@@ -1,12 +1,14 @@
 package com.daelim.guildbackend.controller;
 
-import com.daelim.guildbackend.controller.requestObject.BoardDeleteRequest;
-import com.daelim.guildbackend.controller.requestObject.BoardUpdateRequest;
-import com.daelim.guildbackend.controller.requestObject.BoardWriteRequest;
-import com.daelim.guildbackend.controller.responseObject.BoardListResponse;
-import com.daelim.guildbackend.controller.responseObject.BoardResponse;
+import com.daelim.guildbackend.dto.request.BoardDeleteRequest;
+import com.daelim.guildbackend.dto.request.BoardUpdateRequest;
+import com.daelim.guildbackend.dto.request.BoardWriteRequest;
+import com.daelim.guildbackend.dto.response.BoardListResponse;
+import com.daelim.guildbackend.dto.response.BoardResponse;
+import com.daelim.guildbackend.dto.response.Response;
 import com.daelim.guildbackend.service.BoardService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -31,9 +34,9 @@ public class BoardController {
     BoardService boardService;
 
     @Operation(summary = "게시글 작성")
-    @ApiResponse(description = "등록된 게시글의 boardId")
+    @ApiResponse(description = "등록된 게시글의 정보")
     @PostMapping("/write")
-    public Integer insertBoard(
+    public Response<BoardResponse> insertBoard(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = {
                             @Content(schema = @Schema(implementation = BoardWriteRequest.class))
@@ -47,36 +50,35 @@ public class BoardController {
     // 글 목록 - 내림차순
     @Operation(summary = "게시글 목록 요청 - 내림차순")
     @GetMapping("/list")
-    public List<BoardListResponse> getAllBoardsDESC(@PageableDefault(page = 0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Response<Page<BoardListResponse>> getAllBoardsDESC(@PageableDefault(page = 0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable) {
         return boardService.getAllBoards(pageable);
     }
 
     // 글 목록 - 오름차순
     @Operation(summary = "게시글 목록 요청 - 오름차순")
     @GetMapping("/list/ASC")
-    public List<BoardListResponse> getAllBoardsASC(@PageableDefault(page = 0, size = 10, sort = "boardId", direction = Sort.Direction.ASC) Pageable pageable) {
+    public Response<Page<BoardListResponse>> getAllBoardsASC(@PageableDefault(page = 0, size = 10, sort = "boardId", direction = Sort.Direction.ASC) Pageable pageable) {
         return boardService.getAllBoards(pageable);
     }
 
     // 글 목록 - 유저별
     @GetMapping("/list/{userId}")
     @Operation(summary = "유저별 게시글 목록 요청 - 내림차순")
-    public List<BoardListResponse> getBoardsByUserId(@PageableDefault(page=0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable, @PathVariable String userId) {
+    public Response<Page<BoardListResponse>> getBoardsByUserId(@PageableDefault(page=0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable, @PathVariable String userId) {
         return boardService.getBoardsByUserId(pageable, userId);
     }
 
     // 글 상세
     @GetMapping("/{boardId}")
     @Operation(summary = "게시글 상세 요청")
-    @ApiResponse(content = @Content(schema = @Schema(implementation = BoardResponse.class)))
-    public Map<String, Object> viewBoard(@PathVariable int boardId) {
+    public Response<BoardResponse> viewBoard(@PathVariable int boardId) {
         return boardService.viewBoard(boardId);
     }
 
     // 글 수정
     @Operation(summary = "게시글 수정")
     @PutMapping("/update")
-    public void updateBoard(
+    public Response<BoardResponse> updateBoard(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = {
                             @Content(schema = @Schema(implementation = BoardUpdateRequest.class))
@@ -84,14 +86,14 @@ public class BoardController {
                     description = "태그 수정시 주의사항:<br>태그 추가 시 tagName 배열에 추가할 것<br>기존 태그의 삭제 여부와 상관없이 그대로 tagId 배열에 넣을 것<br>ex)현재글의 태그 목록 [1, 2, 3]에서 3을 삭제 후 '게임' 태그 추가시 -> tagId[1, 2], tagName['게임']"
             )
             @RequestBody Map<String,Object> boardObj, HttpSession session) {
-        boardService.updateBoard(boardObj, session);
+        return boardService.updateBoard(boardObj, session);
     }
 
     // 글 삭제
     @Operation(summary = "게시글 삭제")
     @ApiResponse(description = "삭제 성공 : 0<br>userId 일치하지 않음 : 1")
     @PostMapping("/delete")
-    public String deleteBoardPost(
+    public Response<Object> deleteBoardPost(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(schema = @Schema(implementation = BoardDeleteRequest.class))
             )
@@ -102,13 +104,13 @@ public class BoardController {
     // 글 검색
     @Operation(summary = "제목 및 내용으로 게시글 검색 - 내림차순")
     @GetMapping("/search/{text}")
-    public List<BoardListResponse> searchBoard(@PageableDefault(page=0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable, @PathVariable String text) {
+    public Response<Page<BoardListResponse>> searchBoard(@PageableDefault(page=0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable, @PathVariable String text) {
         return boardService.searchBoard(pageable, text);
     }
 
     @Operation(summary = "태그id로 게시글 검색 - 내림차순")
     @GetMapping("/searchByTagId/{tagId}")
-    public List<BoardListResponse> searchBoardByTagId(@PageableDefault(page=0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable, @PathVariable Integer tagId) {
+    public Response<Page<BoardListResponse>> searchBoardByTagId(@PageableDefault(page=0, size = 10, sort = "boardId", direction = Sort.Direction.DESC) Pageable pageable, @PathVariable Integer tagId) {
         return boardService.searchBoardByTagId(pageable, tagId);
     }
 }

@@ -1,5 +1,9 @@
 package com.daelim.guildbackend.service;
 
+import com.daelim.guildbackend.dto.request.LoginRequest;
+import com.daelim.guildbackend.dto.response.Error;
+import com.daelim.guildbackend.dto.response.Response;
+import com.daelim.guildbackend.dto.response.UserInfoResponse;
 import com.daelim.guildbackend.entity.User;
 import com.daelim.guildbackend.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,51 +23,80 @@ public class UserService{
     @Autowired()
     UserRepository userRepository;
 
-    public String signUp(Map<String, Object> userObj, HttpSession session) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public Response<UserInfoResponse> signUp(Map<String, Object> userObj, HttpSession session) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        Response<UserInfoResponse> res = new Response<>();
         User user = objMpr.convertValue(userObj, User.class);
 
         Optional<User> userS = userRepository.findByUserId(user.getUserId());
         if (userS.isEmpty()) {
             session.setAttribute("userId", user.getUserId());
             user.setPassword(encrypt(user.getPassword()));
-            userRepository.save(user);
-            return user.getUserId();
+            UserInfoResponse uir = new UserInfoResponse(userRepository.save(user));
+            res.setData(uir);
         } else {
-            System.out.println("중복됨");
-            return "0";
+            Error error = new Error();
+            error.setErrorId(0);
+            error.setMessage("아이디가 중복됨");
+            res.setError(error);
         }
+
+        return res;
     }
 
-    public String login(Map<String, Object> userObj, HttpSession session) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        String userId = (String) userObj.get("userId");
-        String password = (String) userObj.get("password");
+    public Response<String> login(Map<String, Object> userObj, HttpSession session) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        Response<String> res = new Response<>();
+        LoginRequest lr = objMpr.convertValue(userObj, LoginRequest.class);
+        String userId = lr.getUserId();
+        String password = lr.getPassword();
 
         Optional<User> byUserId = userRepository.findByUserId(userId);
         if (byUserId.isPresent()) {
             User user = byUserId.get();
             if (user.getPassword().equals(encrypt(password))) {
                 session.setAttribute("userId", userId);
-                return user.getUserId();
+                res.setData(userId);
             } else {
-                return "1"; // id존재 pw틀림
+                Error error = new Error();
+                error.setErrorId(1);
+                error.setMessage("id는 존재하지만 패스워드가 틀림");
+                res.setError(error);
             }
         } else {
-            return "0"; // id틀림
+            Error error = new Error();
+            error.setErrorId(0);
+            error.setMessage("id가 존재하지 않음");
+            res.setError(error);
         }
+
+        return res;
     }
 
-    public void updateUser(Map<String, Object> userObj, HttpSession session) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public Response<UserInfoResponse> updateUser(Map<String, Object> userObj, HttpSession session) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        Response<UserInfoResponse> res = new Response<>();
         User user = objMpr.convertValue(userObj, User.class);
-        if (session.getAttribute("userId") != null && session.getAttribute("userId").equals(user.getUserId())) {
+        if (session.getAttribute("userId") == null) {
+            Error error = new Error();
+            error.setErrorId(0);
+            error.setMessage("로그인상태가 아님");
+            res.setError(error);
+        } else if (!session.getAttribute("userId").equals(user.getUserId())) {
+            Error error = new Error();
+            error.setErrorId(1);
+            error.setMessage("해당 아이디와 로그인된 아이디가 다름");
+            res.setError(error);
+        } else {
             Optional<User> optUser = userRepository.findByUserId(user.getUserId());
             User user1 = optUser.get();
             user.setRegDate(user1.getRegDate());
             user.setPassword(encrypt(user.getPassword()));
-            userRepository.save(user);
+            res.setData(new UserInfoResponse(userRepository.save(user)));
         }
+        
+        return res;
     }
 
-    public String deleteUser(Map<String, Object> userObj, HttpSession session) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public Response<Object> deleteUser(Map<String, Object> userObj, HttpSession session) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        Response<Object> res = new Response<>();
         String userId = (String) userObj.get("userId");
         String password = (String) userObj.get("password");
 
@@ -73,13 +106,20 @@ public class UserService{
             if (user.getPassword().equals(encrypt(password))) {
                 session.removeAttribute("userId");
                 userRepository.deleteById(userId);
-                return "2";
             } else {
-                return "1"; // id맞음 pw틀림
+                Error error = new Error();
+                error.setErrorId(1);
+                error.setMessage("id는 존재하지만 패스워드가 틀림");
+                res.setError(error);
             }
         } else {
-            return "0"; // 로그인 돼있는 id와 다름
+            Error error = new Error();
+            error.setErrorId(1);
+            error.setMessage("해당 id가 로그인 돼있는 id와 다름");
+            res.setError(error);
         }
+
+        return res;
     }
 
     public String encrypt(String pw) throws NoSuchAlgorithmException, UnsupportedEncodingException {
@@ -95,12 +135,30 @@ public class UserService{
         return sb.toString();
     }
     
-    public boolean isIdDup(String userId) {
-        boolean result = false;
+    public Response<Boolean> isIdDup(String userId) {
+        Response<Boolean> res = new Response<>();
+        Boolean result = false;
         Optional<User> userS = userRepository.findByUserId(userId);
         if (userS.isPresent()) {
             result = true;
         }
-        return result;
+
+        res.setData(result);
+        return res;
+    }
+
+    public Response<UserInfoResponse> getUserInfo(String userId) {
+        Response<UserInfoResponse> res = new Response<>();
+        Optional<User> user = userRepository.findByUserId(userId);
+        if (user.isPresent()) {
+            res.setData(new UserInfoResponse(user.get()));
+        } else {
+            Error error = new Error();
+            error.setErrorId(0);
+            error.setMessage("해당 아이디가 존재하지 않음");
+            res.setError(error);
+        }
+
+        return res;
     }
 }

@@ -1,13 +1,15 @@
-package com.daelim.guildbackend.controller.responseObject;
+package com.daelim.guildbackend.dto.response;
 
 import com.daelim.guildbackend.entity.Board;
+import com.daelim.guildbackend.entity.Party;
 import com.daelim.guildbackend.entity.Tag;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class BoardListResponse {
+public class BoardResponse {
     Board board;
-    List <com.daelim.guildbackend.entity.Tag> tags;
+    Party party;
+    List<Tag> tags;
 }

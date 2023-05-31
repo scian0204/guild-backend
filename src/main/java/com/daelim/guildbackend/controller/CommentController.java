@@ -1,8 +1,8 @@
 package com.daelim.guildbackend.controller;
 
-import com.daelim.guildbackend.controller.requestObject.CommentDeleteRequest;
-import com.daelim.guildbackend.controller.requestObject.CommentUpdateRequest;
-import com.daelim.guildbackend.controller.requestObject.CommentWriteRequest;
+import com.daelim.guildbackend.dto.request.CommentDeleteRequest;
+import com.daelim.guildbackend.dto.request.CommentUpdateRequest;
+import com.daelim.guildbackend.dto.request.CommentWriteRequest;
 import com.daelim.guildbackend.entity.Comment;
 import com.daelim.guildbackend.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
