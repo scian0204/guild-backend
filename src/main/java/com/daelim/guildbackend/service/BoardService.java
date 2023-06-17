@@ -143,17 +143,17 @@ public class BoardService{
         Board board = boardOps.get();
         BoardResponse result = new BoardResponse();
         board.setViews(board.getViews() + 1);
-        result.setBoard(boardRepository.save(board));
+        result.setBoard(new Board(boardRepository.save(board)));
 
         // Party
         Party party = partyRepository.getReferenceById(board.getPartyId());
-        result.setParty(party);
+        result.setParty(new Party(party));
 
         // List<Tag> - baordId로 tagBoard에서 목록 가져온 후 forEach를 이용하여 tagBoard의 tagId를 하나하나 검색하여 Tag 리스트에 삽입
         List<Tag> tags = new ArrayList<>();
         List<TagBoard> tagBoards = tagBoardRepository.findByBoardId(boardId);
         tagBoards.forEach((tagBoard)->{
-            tags.add(tagRepository.getReferenceById(tagBoard.getTagId()));
+            tags.add(new Tag(tagRepository.getReferenceById(tagBoard.getTagId())));
         });
         result.setTags(tags);
 

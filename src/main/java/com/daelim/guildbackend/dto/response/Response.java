@@ -1,9 +1,10 @@
 package com.daelim.guildbackend.dto.response;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 public class Response<E> {
-    private E data;
-    private Error error;
+    public E data;
+    public Error error;
 }

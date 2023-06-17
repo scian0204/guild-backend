@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 @Data
 @DynamicInsert
 @DynamicUpdate
+@NoArgsConstructor
 @Entity
 public class Board {
     @Id
@@ -24,4 +25,14 @@ public class Board {
     private Integer partyId;
     private Integer views;
     private Timestamp writeDate;
+
+    public Board(Board board) {
+        this.boardId = board.getBoardId();
+        this.userId = board.getUserId();
+        this.title = board.getTitle();
+        this.content = board.getContent();
+        this.partyId = board.getPartyId();
+        this.views = board.getViews();
+        this.writeDate = board.getWriteDate();
+    }
 }

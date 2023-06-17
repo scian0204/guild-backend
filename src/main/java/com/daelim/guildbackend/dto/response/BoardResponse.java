@@ -4,12 +4,13 @@ import com.daelim.guildbackend.entity.Board;
 import com.daelim.guildbackend.entity.Party;
 import com.daelim.guildbackend.entity.Tag;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 public class BoardResponse {
-    Board board;
-    Party party;
-    List<Tag> tags;
+    private Board board;
+    private Party party;
+    private List<Tag> tags;
 }
