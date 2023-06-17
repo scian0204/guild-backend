@@ -38,6 +38,7 @@ public class BoardService{
     public Response<BoardResponse> write(Map<String, Object> boardObj) {
         Response<BoardResponse> res = new Response<>();
         BoardResponse result = new BoardResponse();
+        result.setTags(new ArrayList<>());
 
         // 파티 생성
         Party party = new Party();
