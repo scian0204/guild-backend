@@ -179,7 +179,8 @@ public class BoardService{
             Integer[] updateTagIds = g.fromJson(boardObj.get("tagId")+"", Integer[].class);
             boardObj.remove("tagId");
             String[] tagNames = g.fromJson(boardObj.get("tagName")+"", String[].class);
-            Integer total = null;
+            Integer total = (Integer) boardObj.get("total");
+            boardObj.remove("total");
             Integer boardId = (Integer) boardObj.get("boardId");
 
             if (updateTagIds != null) {
@@ -222,6 +223,7 @@ public class BoardService{
                 }
                 boardObj.remove("tagName");
             }
+
             Board board = objMpr.convertValue(boardObj, Board.class);
 
             //board
@@ -231,8 +233,7 @@ public class BoardService{
             board.setPartyId(board1.getPartyId());
 
             Party party = partyRepository.findById(board.getPartyId()).get();
-            if (boardObj.get("total") != null) {
-                total = (Integer) boardObj.get("total");
+            if (total != null) {
                 party.setTotal(total);
                 partyRepository.save(party);
                 boardObj.remove("total");
